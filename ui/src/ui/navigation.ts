@@ -7,12 +7,13 @@ export const TAB_GROUPS = [
     label: "control",
     tabs: ["overview", "channels", "instances", "sessions", "usage", "cron"],
   },
-  { label: "agent", tabs: ["agents", "skills", "nodes"] },
-  { label: "settings", tabs: ["config", "debug", "logs"] },
+  { label: "Agent", tabs: ["agents", "employees", "skills", "nodes"] },
+  { label: "Settings", tabs: ["config", "debug", "logs"] },
 ] as const;
 
 export type Tab =
   | "agents"
+  | "employees"
   | "overview"
   | "channels"
   | "instances"
@@ -28,6 +29,7 @@ export type Tab =
 
 const TAB_PATHS: Record<Tab, string> = {
   agents: "/agents",
+  employees: "/employees",
   overview: "/overview",
   channels: "/channels",
   instances: "/instances",
@@ -123,10 +125,13 @@ export function inferBasePathFromPathname(pathname: string): string {
   return `/${segments.join("/")}`;
 }
 
+
 export function iconForTab(tab: Tab): IconName {
   switch (tab) {
     case "agents":
       return "folder";
+    case "employees":
+      return "folder"; // Fallback until we verify icons
     case "chat":
       return "messageSquare";
     case "overview":
@@ -157,9 +162,71 @@ export function iconForTab(tab: Tab): IconName {
 }
 
 export function titleForTab(tab: Tab) {
-  return t(`tabs.${tab}`);
+  switch (tab) {
+    case "agents":
+      return "Agents";
+    case "employees":
+      return "Employees";
+    case "overview":
+      return "Overview";
+    case "channels":
+      return "Channels";
+    case "instances":
+      return "Instances";
+    case "sessions":
+      return "Sessions";
+    case "usage":
+      return "Usage";
+    case "cron":
+      return "Cron Jobs";
+    case "skills":
+      return "Skills";
+    case "nodes":
+      return "Nodes";
+    case "chat":
+      return "Chat";
+    case "config":
+      return "Config";
+    case "debug":
+      return "Debug";
+    case "logs":
+      return "Logs";
+    default:
+      return "Control";
+  }
 }
 
 export function subtitleForTab(tab: Tab) {
-  return t(`subtitles.${tab}`);
+  switch (tab) {
+    case "agents":
+      return "Manage agent workspaces, tools, and identities.";
+    case "employees":
+      return "Manage AI Employees, roles, and knowledge assignments.";
+    case "overview":
+      return "Gateway status, entry points, and a fast health read.";
+    case "channels":
+      return "Manage channels and settings.";
+    case "instances":
+      return "Presence beacons from connected clients and nodes.";
+    case "sessions":
+      return "Inspect active sessions and adjust per-session defaults.";
+    case "usage":
+      return "";
+    case "cron":
+      return "Schedule wakeups and recurring agent runs.";
+    case "skills":
+      return "Manage skill availability and API key injection.";
+    case "nodes":
+      return "Paired devices, capabilities, and command exposure.";
+    case "chat":
+      return "Direct gateway chat session for quick interventions.";
+    case "config":
+      return "Edit ~/.openclaw/openclaw.json safely.";
+    case "debug":
+      return "Gateway snapshots, events, and manual RPC calls.";
+    case "logs":
+      return "Live tail of the gateway file logs.";
+    default:
+      return "";
+  }
 }
