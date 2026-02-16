@@ -1,0 +1,17 @@
+{
+  "name": "@openclaw/plugin-ecommerce-order",
+  "version": "0.0.1",
+  "private": true,
+  "description": "E-commerce order checking plugin for OpenClaw",
+  "type": "module",
+  "main": "index.ts",
+  "devDependencies": {
+    "openclaw": "workspace:*",
+    "zod": "^3.22.4"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

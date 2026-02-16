@@ -1,3 +1,7 @@
+# txe and sh
+*.sh
+*.txt
+/doc/
 node_modules
 **/node_modules/
 .env

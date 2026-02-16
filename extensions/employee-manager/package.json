@@ -1,0 +1,22 @@
+{
+  "name": "@openclaw/plugin-employee-manager",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Employee management plugin for OpenClaw",
+  "type": "module",
+  "main": "index.ts",
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "openclaw": "workspace:*",
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.13.1"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
