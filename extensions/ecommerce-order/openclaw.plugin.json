@@ -1,0 +1,10 @@
+{
+  "id": "ecommerce-order",
+  "name": "E-commerce Order",
+  "description": "Check order status tool",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

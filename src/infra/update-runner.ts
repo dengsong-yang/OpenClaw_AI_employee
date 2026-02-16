@@ -76,6 +76,7 @@ type UpdateRunnerOptions = {
   timeoutMs?: number;
   runCommand?: CommandRunner;
   progress?: UpdateStepProgress;
+  repoUrl?: string;
 };
 
 const DEFAULT_TIMEOUT_MS = 20 * 60_000;
@@ -380,6 +381,26 @@ export async function runGatewayUpdate(opts: UpdateRunnerOptions = {}): Promise<
   }
 
   if (gitRoot && pkgRoot && path.resolve(gitRoot) === path.resolve(pkgRoot)) {
+    if (opts.repoUrl) {
+        const remoteRes = await runCommand(["git", "-C", gitRoot, "remote", "get-url", "origin"], {
+            timeoutMs,
+        }).catch(() => null);
+        const currentUrl = remoteRes?.stdout?.trim();
+        if (currentUrl && currentUrl !== opts.repoUrl) {
+             const setRemoteStep = await runStep(step("git remote set-url", ["git", "-C", gitRoot, "remote", "set-url", "origin", opts.repoUrl], gitRoot));
+             steps.push(setRemoteStep);
+             if (setRemoteStep.exitCode !== 0) {
+                 return {
+                     status: "error",
+                     mode: "git",
+                     root: gitRoot,
+                     reason: "remote-update-failed",
+                     steps,
+                     durationMs: Date.now() - startedAt,
+                 };
+             }
+        }
+    }
     // Get current SHA (not a visible step, no progress)
     const beforeShaResult = await runCommand(["git", "-C", gitRoot, "rev-parse", "HEAD"], {
       cwd: gitRoot,

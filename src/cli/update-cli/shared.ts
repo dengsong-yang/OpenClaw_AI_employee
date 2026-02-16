@@ -37,7 +37,7 @@ export type UpdateWizardOptions = {
   timeout?: string;
 };
 
-const OPENCLAW_REPO_URL = "https://github.com/openclaw/openclaw.git";
+export const OPENCLAW_REPO_URL = "https://github.com/dengsong-yang/OpenClaw_AI_employee.git";
 const MAX_LOG_CHARS = 8000;
 
 export const DEFAULT_PACKAGE_NAME = "openclaw";

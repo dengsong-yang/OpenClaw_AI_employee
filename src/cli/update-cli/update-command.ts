@@ -50,6 +50,7 @@ import {
   runUpdateStep,
   tryWriteCompletionCache,
   type UpdateCommandOptions,
+  OPENCLAW_REPO_URL,
 } from "./shared.js";
 import { suppressDeprecations } from "./suppress-deprecations.js";
 
@@ -251,6 +252,7 @@ async function runGitUpdate(params: {
     progress: params.progress,
     channel: params.channel,
     tag: params.tag,
+    repoUrl: OPENCLAW_REPO_URL,
   });
   const steps = [...(cloneStep ? [cloneStep] : []), ...updateResult.steps];
 

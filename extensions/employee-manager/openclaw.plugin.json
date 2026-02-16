@@ -1,0 +1,10 @@
+{
+  "id": "employee-manager",
+  "name": "Employee Manager",
+  "description": "Manage AI employees",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}
