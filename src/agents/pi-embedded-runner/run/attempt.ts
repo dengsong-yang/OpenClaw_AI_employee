@@ -909,6 +909,13 @@ export async function runEmbeddedAttempt(
             .filter((value): value is string => Boolean(value))
             .join("\n\n"),
         };
+        
+        // AntiGravity Patch: Allow plugins to override system prompt dynamically
+        if (hookResult.systemPrompt) {
+            log.debug(`hooks: overriding system prompt with plugin result (${hookResult.systemPrompt.length} chars)`);
+            applySystemPromptOverrideToSession(activeSession, hookResult.systemPrompt);
+        }
+
         {
           if (hookResult?.prependContext) {
             effectivePrompt = `${hookResult.prependContext}\n\n${params.prompt}`;

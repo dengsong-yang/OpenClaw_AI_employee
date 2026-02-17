@@ -48,8 +48,9 @@ export class EmployeeManagerImpl {
             is_active BOOLEAN DEFAULT 1,
             created_at INTEGER DEFAULT (unixepoch()),
             updated_at INTEGER DEFAULT (unixepoch())
-        );
-        CREATE TABLE IF NOT EXISTS employee_history (
+        );`);
+        
+        this.db.exec(`CREATE TABLE IF NOT EXISTS employee_history (
             id TEXT PRIMARY KEY,
             employee_id TEXT NOT NULL,
             role TEXT NOT NULL,

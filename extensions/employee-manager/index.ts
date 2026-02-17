@@ -46,7 +46,7 @@ export default function register(api: OpenClawPluginApi) {
     }
   } as any);
 
-  api.logger.debug?("========== Employee Manager Plugin Loaded (v2.0 Debug) ==========");
+  api.logger.info("========== Employee Manager Plugin Loaded (v2.0 Debug) ==========");
 
   // Track active runs for context persistence
   const activeRuns = new Map<string, string>(); // runId -> employeeId
@@ -54,18 +54,18 @@ export default function register(api: OpenClawPluginApi) {
   // Hook: Before Prompt Build - Intercept & Inject Context
   api.on("before_prompt_build", async (event, ctx) => {
       // DEBUG LOG
-      api.logger.debug?(`[EmployeeManager] before_prompt_build triggered. Prompt preview: ${event.prompt.substring(0, 100)}...`);
+      api.logger.info(`[EmployeeManager] before_prompt_build triggered. Prompt preview: ${event.prompt.substring(0, 100)}...`);
 
       // 1. Check for explicit dispatch tag from UI (allow timestamp prefix, full-width colon, case-insensitive)
       const match = event.prompt.match(/@employee[:：]\s*(\S+)/i);
       
       if (!match) {
-        api.logger.debug?("[EmployeeManager] No @employee tag found using regex /@employee[:：]\s*(\S+)/i");
+        api.logger.info("[EmployeeManager] No @employee tag found using regex /@employee[:：]\s*(\S+)/i");
         return;
       }
 
       const slug = match[1];
-      api.logger.debug?(`[EmployeeManager] Detected tag for slug: ${slug}`);
+      api.logger.info(`[EmployeeManager] Detected tag for slug: ${slug}`);
 
       if (!manager) {
         api.logger.error("[EmployeeManager] Manager not initialized!");
@@ -75,14 +75,14 @@ export default function register(api: OpenClawPluginApi) {
       const emp = await manager.getEmployeeBySlug(slug) || await manager.getEmployee(slug);
       
       if (!emp) {
-        api.logger.debug?(`[EmployeeManager] Employee '${slug}' not found in DB.`);
+        api.logger.warn(`[EmployeeManager] Employee '${slug}' not found in DB.`);
         // Fallback: Inform the Main Assistant about the failed lookup so it can explain to the user.
         return {
             prependContext: `[System Warning: User attempted to contact employee '${slug}', but it was not found. Please inform the user that this employee ID/Slug is invalid or does not exist.]`
         };
       }
 
-      api.logger.debug?(`[EmployeeManager] Found employee: ${emp.name} (${emp.id}). Injecting context.`);
+      api.logger.info(`[EmployeeManager] Found employee: ${emp.name} (${emp.id}). Injecting context.`);
 
       // 2. Persist User Message
       const cleanMessage = event.prompt.replace(/@employee:\S+\s*/, '');
@@ -92,7 +92,7 @@ export default function register(api: OpenClawPluginApi) {
       // This prevents the Global History from leaking into the Employee's context window.
       // We rely on JS array reference mutability here.
       if (Array.isArray(event.messages)) {
-        api.logger.debug?(`[EmployeeManager] Clearing global messages count: ${event.messages.length}`);
+        api.logger.info(`[EmployeeManager] Clearing global messages count: ${event.messages.length}`);
         event.messages.length = 0;
       }
 
@@ -102,21 +102,39 @@ export default function register(api: OpenClawPluginApi) {
           ? history.map(h => `${h.role === 'user' ? 'User' : emp.name}: ${h.content}`).join('\n')
           : "(No previous history)";
 
-      // 5. Inject Context
-      return {
-          // Replace Global Persona with Employee Persona
-          systemPrompt: `[System: Context Switch]
-You are now acting as the AI Employee '${emp.name}'.
-IGNORE ALL PREVIOUS SESSION HISTORY. IT IS IRRELEVANT.
-Focus ONLY on the specific permissions and memory of this employee.
+      // 5. Inject Context - HARDENING
+      // We inject the persona into `prependContext` because it usually has higher immediate attention 
+      // from the model than the System Prompt (which might be distant or forgotten).
+      const forcedContext = `[SYSTEM OVERRIDE INITIATED]
+--------------------------------------------------------------------------------
+CRITICAL INSTRUCTION: SUSPEND DEFAULT IDENTITY ("TieTie" / "Main Assistant").
+YOU ARE NOW ACTING AS: ${emp.name} (ID: ${emp.id})
+--------------------------------------------------------------------------------
 
-[Role Definition]
+[YOUR ROLE]
+${emp.roleDescription}
+
+[YOUR INSTRUCTIONS]
 ${emp.systemPrompt}
 
-[Permission Boundary]
-You are strictly limited to your role. Do not admit you are the main assistant.`,
-          // Inject Employee Memory
-          prependContext: `[Employee Memory (Private Context)]\n${historyText}\n\n[End Memory]`
+[STRICT CONSTRAINTS]
+1. You are NOT "TieTie". Do not use that name.
+2. You are ${emp.name}.
+3. Respond exclusively based on the above role.
+
+[EMPLOYEE MEMORY (Private Context)]
+${historyText}
+
+[END MEMORY]
+--------------------------------------------------------------------------------
+Start of Employee Session:
+`;
+
+      return {
+          // We still provide a system prompt, but the heavy lifting is done in prependContext.
+          systemPrompt: `You are ${emp.name}. ${emp.roleDescription}`,
+          
+          prependContext: forcedContext
       };
   });
 
@@ -128,7 +146,7 @@ You are strictly limited to your role. Do not admit you are the main assistant.`
          // Quick lookup or trust the slug from prompt if we assume it's valid (optimized)
          const emp = await manager.getEmployeeBySlug(slug) || await manager.getEmployee(slug);
          if (emp) {
-             api.logger.debug?(`[EmployeeManager] Tracking RunID ${event.runId} for employee ${emp.name}`);
+             api.logger.info(`[EmployeeManager] Tracking RunID ${event.runId} for employee ${emp.name}`);
              activeRuns.set(event.runId, emp.id);
          }
       }
@@ -139,7 +157,7 @@ You are strictly limited to your role. Do not admit you are the main assistant.`
       const employeeId = activeRuns.get(event.runId);
       if (!employeeId || !manager) return;
 
-      api.logger.debug?(`[EmployeeManager] Capturing output for employee ${employeeId}`);
+      api.logger.info(`[EmployeeManager] Capturing output for employee ${employeeId}`);
 
       const content = event.assistantTexts.join('\n');
       if (content) {
@@ -228,7 +246,7 @@ You are strictly limited to your role. Do not admit you are the main assistant.`
         }
     }
   });
-  api.logger.debug?("Employee Manager plugin registered.");
+  api.logger.info("Employee Manager plugin registered.");
 }
 
 function readBody(req: any): Promise<any> {

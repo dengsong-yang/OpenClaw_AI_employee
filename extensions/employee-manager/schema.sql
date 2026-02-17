@@ -10,3 +10,11 @@ CREATE TABLE IF NOT EXISTS employees (
     created_at INTEGER DEFAULT (unixepoch()),
     updated_at INTEGER DEFAULT (unixepoch())
 );
+CREATE TABLE IF NOT EXISTS employee_history (
+    id TEXT PRIMARY KEY,
+    employee_id TEXT NOT NULL,
+    role TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at INTEGER DEFAULT (unixepoch()),
+    FOREIGN KEY(employee_id) REFERENCES employees(id) ON DELETE CASCADE
+);
