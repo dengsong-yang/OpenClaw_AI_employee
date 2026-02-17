@@ -1,7 +1,8 @@
 
 import type { OpenClawPluginApi, OpenClawPluginServiceContext } from "../../src/plugins/types.js";
 import { EmployeeManagerImpl } from "./src/manager.js";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 
 export default function register(api: OpenClawPluginApi) {
@@ -11,9 +12,16 @@ export default function register(api: OpenClawPluginApi) {
   api.registerService({
     id: "employee-manager-service",
     start: async (ctx: OpenClawPluginServiceContext) => {
-      const dbPath = join(ctx.stateDir, "employees.sqlite");
-      manager = new EmployeeManagerImpl(dbPath);
-      api.logger.info(`Employee Manager initialized at ${dbPath}`);
+      try {
+        const dbPath = join(ctx.stateDir, "employees.sqlite");
+        api.logger.info(`Initializing Employee Manager DB at: ${dbPath}`);
+        
+        manager = new EmployeeManagerImpl(dbPath);
+        api.logger.info("Employee Manager initialized successfully.");
+      } catch (err: any) {
+        api.logger.error(`Failed to initialize Employee Manager: ${err.message}`);
+        // Ensure directory exists if possible? ctx.stateDir should exist.
+      }
     }
   });
 
