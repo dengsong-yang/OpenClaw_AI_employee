@@ -48,6 +48,14 @@ export class EmployeeManagerImpl {
             is_active BOOLEAN DEFAULT 1,
             created_at INTEGER DEFAULT (unixepoch()),
             updated_at INTEGER DEFAULT (unixepoch())
+        );
+        CREATE TABLE IF NOT EXISTS employee_history (
+            id TEXT PRIMARY KEY,
+            employee_id TEXT NOT NULL,
+            role TEXT NOT NULL,
+            content TEXT NOT NULL,
+            created_at INTEGER DEFAULT (unixepoch()),
+            FOREIGN KEY(employee_id) REFERENCES employees(id) ON DELETE CASCADE
         );`);
     }
 
@@ -66,6 +74,12 @@ export class EmployeeManagerImpl {
 
   async getEmployee(id: string): Promise<Employee | null> {
     const row = this.db.prepare('SELECT * FROM employees WHERE id = ?').get(id) as any;
+    if (!row) return null;
+    return this.mapRow(row);
+  }
+
+  async getEmployeeBySlug(slug: string): Promise<Employee | null> {
+    const row = this.db.prepare('SELECT * FROM employees WHERE slug = ?').get(slug) as any;
     if (!row) return null;
     return this.mapRow(row);
   }
@@ -119,6 +133,17 @@ export class EmployeeManagerImpl {
 
   async deleteEmployee(id: string): Promise<void> {
     this.db.prepare('DELETE FROM employees WHERE id = ?').run(id);
+  }
+
+  async addHistory(employeeId: string, role: string, content: string): Promise<void> {
+    const crypto = await import('node:crypto'); // dynamic import or require if needed, but safe here in node
+    const id = crypto.randomUUID();
+    this.db.prepare(`INSERT INTO employee_history (id, employee_id, role, content) VALUES (?, ?, ?, ?)`).run(id, employeeId, role, content);
+  }
+
+  async getHistory(employeeId: string, limit = 10): Promise<Array<{ role: string, content: string }>> {
+    const rows = this.db.prepare(`SELECT role, content FROM employee_history WHERE employee_id = ? ORDER BY created_at DESC LIMIT ?`).all(employeeId, limit) as any[];
+    return rows.reverse().map(r => ({ role: r.role, content: r.content }));
   }
 
   private mapRow(row: any): Employee {

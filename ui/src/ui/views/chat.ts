@@ -69,6 +69,9 @@ export type ChatProps = {
   onCloseSidebar?: () => void;
   onSplitRatioChange?: (ratio: number) => void;
   onChatScroll?: (event: Event) => void;
+  employees?: any[];
+  selectedEmployeeId?: string | null;
+  onEmployeeSelect?: (id: string | null) => void;
 };
 
 const COMPACTION_TOAST_DURATION_MS = 5000;
@@ -369,6 +372,22 @@ export function renderChat(props: ChatProps) {
       }
 
       <div class="chat-compose">
+        ${
+          props.employees && props.employees.length > 0
+            ? html`
+                <div class="chat-compose__config" style="padding: 0 16px 8px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted);">
+                  <span>Talk to:</span>
+                  <select 
+                    style="background: var(--surface-2); border: 1px solid var(--surface-3); border-radius: 4px; padding: 4px 8px; color: var(--text); font-size: 12px;"
+                    @change=${(e: Event) => props.onEmployeeSelect?.((e.target as HTMLSelectElement).value || null)}
+                  >
+                    <option value="" ?selected=${!props.selectedEmployeeId}>Main Assistant</option>
+                    ${props.employees.map(emp => html`<option value="${emp.slug}" ?selected=${props.selectedEmployeeId === emp.slug}>${emp.name} - ${emp.roleDescription}</option>`)}
+                  </select>
+                </div>
+              `
+            : nothing
+        }
         ${renderAttachmentPreview(props)}
         <div class="chat-compose__row">
           <label class="field chat-compose__field">

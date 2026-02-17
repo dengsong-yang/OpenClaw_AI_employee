@@ -138,6 +138,7 @@ export class OpenClawApp extends LitElement {
   @state() chatToolMessages: unknown[] = [];
   @state() chatStream: string | null = null;
   @state() chatStreamStartedAt: number | null = null;
+  @state() chatEmployeeId: string | null = null;
   @state() chatRunId: string | null = null;
   @state() compactionStatus: CompactionStatus | null = null;
   @state() chatAvatarUrl: string | null = null;
@@ -227,7 +228,8 @@ export class OpenClawApp extends LitElement {
   @state() agentSkillsError: string | null = null;
   @state() agentSkillsReport: SkillStatusReport | null = null;
   @state() agentSkillsAgentId: string | null = null;
-
+  @state() employeesList: any[] = [];
+  
   @state() sessionsLoading = false;
   @state() sessionsResult: SessionsListResult | null = null;
   @state() sessionsError: string | null = null;
@@ -365,6 +367,7 @@ export class OpenClawApp extends LitElement {
 
   protected firstUpdated() {
     handleFirstUpdated(this as unknown as Parameters<typeof handleFirstUpdated>[0]);
+    this.loadEmployees();
   }
 
   disconnectedCallback() {
@@ -433,6 +436,17 @@ export class OpenClawApp extends LitElement {
 
   async loadOverview() {
     await loadOverviewInternal(this as unknown as Parameters<typeof loadOverviewInternal>[0]);
+    this.loadEmployees();
+  }
+
+  async loadEmployees() {
+    try {
+        const res = await fetch('/api/ext/employees');
+        if (res.ok) {
+            this.employeesList = await res.json();
+            // Force re-render of chat so it sees the list? Lit handles it.
+        }
+    } catch(e) { }
   }
 
   async loadCron() {

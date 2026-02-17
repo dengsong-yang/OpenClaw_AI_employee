@@ -22,6 +22,7 @@ export type ChatHost = {
   hello: GatewayHelloOk | null;
   chatAvatarUrl: string | null;
   refreshSessionsAfterChat: Set<string>;
+  chatEmployeeId: string | null;
 };
 
 export const CHAT_SESSIONS_ACTIVE_MINUTES = 120;
@@ -165,7 +166,11 @@ export async function handleSendChat(
     return;
   }
   const previousDraft = host.chatMessage;
-  const message = (messageOverride ?? host.chatMessage).trim();
+  let message = (messageOverride ?? host.chatMessage).trim();
+  if (host.chatEmployeeId && !messageOverride && message) {
+    // Use a clean protocol tag for the backend hook to detect
+    message = `@employee:${host.chatEmployeeId} ${message}`;
+  }
   const attachments = host.chatAttachments ?? [];
   const attachmentsToSend = messageOverride == null ? attachments : [];
   const hasAttachments = attachmentsToSend.length > 0;

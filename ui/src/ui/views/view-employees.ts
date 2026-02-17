@@ -166,7 +166,7 @@ export class ViewEmployees extends LitElement {
               // Backend: INSERT INTO ... VALUES (@id, ...)
               // So I must provide ID.
               if (!this.editForm.id) {
-                  this.editForm.id = crypto.randomUUID();
+                  this.editForm.id = uuidv4();
               }
           }
 
@@ -297,4 +297,16 @@ export class ViewEmployees extends LitElement {
         </div>
       `;
   }
+}
+
+function uuidv4(): string {
+  // @ts-ignore
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    // @ts-ignore
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }

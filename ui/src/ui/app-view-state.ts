@@ -59,6 +59,7 @@ export type AppViewState = {
   chatToolMessages: unknown[];
   chatStream: string | null;
   chatStreamStartedAt: number | null;
+  chatEmployeeId: string | null;
   chatRunId: string | null;
   compactionStatus: CompactionStatus | null;
   chatAvatarUrl: string | null;
@@ -142,6 +143,7 @@ export type AppViewState = {
   agentSkillsError: string | null;
   agentSkillsReport: SkillStatusReport | null;
   agentSkillsAgentId: string | null;
+  employeesList: Array<any>;
   sessionsLoading: boolean;
   sessionsResult: SessionsListResult | null;
   sessionsError: string | null;
