@@ -73,9 +73,16 @@ export function resolveModel(
         modelRegistry,
       };
     }
+
+    // 先引用引入依赖用于看列表：
+    console.log("=== Debug: Current built-in Antigravity models ===");
+    console.log(modelRegistry.getAll().filter(m => m.provider === "google-antigravity").map(m => m.id));
     // Forward-compat fallbacks must be checked BEFORE the generic providerCfg fallback.
     // Otherwise, configured providers can default to a generic API and break specific transports.
     const forwardCompat = resolveForwardCompatModel(provider, modelId, modelRegistry);
+
+    console.log("=== Debug: resolveForwardCompatModel Returned: ===", forwardCompat != null ? forwardCompat.id : "undefined");
+    
     if (forwardCompat) {
       return { model: forwardCompat, authStorage, modelRegistry };
     }

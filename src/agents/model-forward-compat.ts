@@ -27,15 +27,27 @@ const ANTIGRAVITY_SONNET_THINKING_TEMPLATE_IDS = [
 const ANTIGRAVITY_GEMINI_31_PRO_MODEL_ID = "gemini-3.1-pro-preview";
 const ANTIGRAVITY_GEMINI_31_PRO_LOW_MODEL_ID = "gemini-3.1-pro-low";
 const ANTIGRAVITY_GEMINI_31_PRO_HIGH_MODEL_ID = "gemini-3.1-pro-high";
-const ANTIGRAVITY_GEMINI_TEMPLATE_IDS = ["gemini-3-pro", "gemini-2.5-pro"] as const;
+const ANTIGRAVITY_GEMINI_TEMPLATE_IDS = [
+  "gemini-3.1-pro-preview", 
+  "gemini-3-pro-preview", 
+  "gemini-3-pro", 
+  "gemini-2.5-pro", 
+  "gemini-1.5-pro",
+] as const;
 
 const ANTIGRAVITY_GEMINI_31_PRO_THINKING_MODEL_ID = "gemini-3.1-pro-preview-thinking";
 const ANTIGRAVITY_GEMINI_31_PRO_LOW_THINKING_MODEL_ID = "gemini-3.1-pro-low-thinking";
 const ANTIGRAVITY_GEMINI_THINKING_TEMPLATE_IDS = [
+  "gemini-3.1-pro-preview-thinking",
+  "gemini-3-pro-preview-thinking",
   "gemini-3-pro-thinking",
   "gemini-2.5-pro-thinking",
+  "gemini-1.5-pro-thinking",
+  "gemini-3.1-pro-preview",
+  "gemini-3-pro-preview",
   "gemini-3-pro",
   "gemini-2.5-pro",
+  "gemini-1.5-pro",
 ] as const;
 
 const ZAI_GLM5_MODEL_ID = "glm-5";
