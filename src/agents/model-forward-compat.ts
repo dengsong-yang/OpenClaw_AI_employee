@@ -30,6 +30,8 @@ const ANTIGRAVITY_GEMINI_31_PRO_HIGH_MODEL_ID = "gemini-3.1-pro-high";
 const ANTIGRAVITY_GEMINI_TEMPLATE_IDS = [
   "gemini-3.1-pro-preview", 
   "gemini-3-pro-preview", 
+  "gemini-3-pro-low", 
+  "gemini-3-pro-high", 
   "gemini-3-pro", 
   "gemini-2.5-pro", 
   "gemini-1.5-pro",
@@ -45,6 +47,8 @@ const ANTIGRAVITY_GEMINI_THINKING_TEMPLATE_IDS = [
   "gemini-1.5-pro-thinking",
   "gemini-3.1-pro-preview",
   "gemini-3-pro-preview",
+  "gemini-3-pro-low",
+  "gemini-3-pro-high",
   "gemini-3-pro",
   "gemini-2.5-pro",
   "gemini-1.5-pro",
